@@ -7,22 +7,24 @@ interface TagContextType {
   tags: Tag[];
   loading: boolean;
   addTag: (name: string, color: TagColor) => void;
-  updateTag: (id: string, name: string, color: TagColor) => void;
+  updateTag: (id: string, name: string, color: TagColor, assignedUsers?: string[]) => void;
   deleteTag: (id: string) => void;
   selectedTags: string[];
   toggleTag: (tagId: string) => void;
   clearSelectedTags: () => void;
+  assignUsersToTag: (tagId: string, userIds: string[]) => void;
+  removeUserFromTag: (tagId: string, userId: string) => void;
 }
 
 const TagContext = createContext<TagContextType | undefined>(undefined);
 
 // Sample initial tags
 const initialTags: Tag[] = [
-  { id: "1", name: "Important", color: "red", count: 5 },
-  { id: "2", name: "Personal", color: "blue", count: 3 },
-  { id: "3", name: "Work", color: "green", count: 8 },
-  { id: "4", name: "Learning", color: "violet", count: 2 },
-  { id: "5", name: "Project", color: "orange", count: 4 },
+  { id: "1", name: "Important", color: "red", count: 5, assignedUsers: ["1"] },
+  { id: "2", name: "Personal", color: "blue", count: 3, assignedUsers: ["2"] },
+  { id: "3", name: "Work", color: "green", count: 8, assignedUsers: ["1", "3"] },
+  { id: "4", name: "Learning", color: "violet", count: 2, assignedUsers: [] },
+  { id: "5", name: "Project", color: "orange", count: 4, assignedUsers: ["2", "3"] },
 ];
 
 export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -46,13 +48,14 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       name: name.trim(),
       color: color,
       count: 0,
+      assignedUsers: [],
     };
 
     setTags([...tags, newTag]);
     toast.success(`Tag "${name}" created successfully`);
   };
 
-  const updateTag = (id: string, name: string, color: TagColor) => {
+  const updateTag = (id: string, name: string, color: TagColor, assignedUsers?: string[]) => {
     if (name.trim() === "") {
       toast.error("Tag name cannot be empty");
       return;
@@ -65,7 +68,12 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     setTags(
       tags.map(tag => 
-        tag.id === id ? { ...tag, name: name.trim(), color } : tag
+        tag.id === id ? { 
+          ...tag, 
+          name: name.trim(), 
+          color,
+          assignedUsers: assignedUsers !== undefined ? assignedUsers : tag.assignedUsers
+        } : tag
       )
     );
     toast.success(`Tag "${name}" updated successfully`);
@@ -92,6 +100,29 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSelectedTags([]);
   };
 
+  const assignUsersToTag = (tagId: string, userIds: string[]) => {
+    setTags(
+      tags.map(tag =>
+        tag.id === tagId ? { ...tag, assignedUsers: userIds } : tag
+      )
+    );
+    toast.success("Users assigned to tag successfully");
+  };
+
+  const removeUserFromTag = (tagId: string, userId: string) => {
+    const tag = tags.find(t => t.id === tagId);
+    if (!tag || !tag.assignedUsers) return;
+
+    const updatedUsers = tag.assignedUsers.filter(id => id !== userId);
+    
+    setTags(
+      tags.map(t =>
+        t.id === tagId ? { ...t, assignedUsers: updatedUsers } : t
+      )
+    );
+    toast.success("User removed from tag successfully");
+  };
+
   return (
     <TagContext.Provider
       value={{
@@ -102,7 +133,9 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         deleteTag,
         selectedTags,
         toggleTag,
-        clearSelectedTags
+        clearSelectedTags,
+        assignUsersToTag,
+        removeUserFromTag
       }}
     >
       {children}

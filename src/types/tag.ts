@@ -4,6 +4,7 @@ export interface Tag {
   name: string;
   color: string;
   count?: number;
+  assignedUsers?: string[]; // Array of user IDs assigned to this tag
 }
 
 export type TagColor = 
