@@ -1,10 +1,11 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tag, UserRound } from "lucide-react";
+import { Tag, UserRound, Activity as ActivityIcon } from "lucide-react";
 import TagList from "./TagList";
 import TagFilter from "./TagFilter";
 import UserList from "../user/UserList";
+import ActivityLog from "../activity/ActivityLog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useUsers } from "@/contexts/UserContext";
 import { useTags } from "@/contexts/TagContext";
@@ -56,6 +57,9 @@ const TagDashboard: React.FC = () => {
             <TabsTrigger value="users">
               <UserRound className="h-4 w-4 mr-2" /> Users
             </TabsTrigger>
+            <TabsTrigger value="activity">
+              <ActivityIcon className="h-4 w-4 mr-2" /> Activity
+            </TabsTrigger>
           </TabsList>
           
           <TabsContent value="tags">
@@ -78,6 +82,10 @@ const TagDashboard: React.FC = () => {
                 <UserList />
               </CardContent>
             </Card>
+          </TabsContent>
+          
+          <TabsContent value="activity">
+            <ActivityLog />
           </TabsContent>
         </Tabs>
         

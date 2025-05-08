@@ -2,6 +2,7 @@
 import React, { createContext, useState, useContext } from "react";
 import { User, UserRole } from "@/types/user";
 import { toast } from "sonner";
+import { useActivities } from "./ActivityContext";
 
 interface UserContextType {
   users: User[];
@@ -28,6 +29,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [users, setUsers] = useState<User[]>(initialUsers);
   const [loading, setLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const { addActivity } = useActivities();
 
   const addUser = (name: string, email: string, role: UserRole) => {
     if (name.trim() === "" || email.trim() === "") {
@@ -48,6 +50,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     setUsers([...users, newUser]);
+    
+    // Log activity
+    addActivity("create", "user", newUser.id, newUser.name);
+    
     toast.success(`User "${name}" added successfully`);
   };
 
@@ -67,6 +73,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user.id === id ? { ...user, name: name.trim(), email: email.trim().toLowerCase(), role } : user
       )
     );
+    
+    // Log activity
+    addActivity("update", "user", id, name.trim());
+    
     toast.success(`User "${name}" updated successfully`);
   };
 
@@ -76,6 +86,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setUsers(users.filter(user => user.id !== id));
     setSelectedUsers(selectedUsers.filter(userId => userId !== id));
+    
+    // Log activity
+    addActivity("delete", "user", id, userToDelete.name);
+    
     toast.success(`User "${userToDelete.name}" deleted successfully`);
   };
 
