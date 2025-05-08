@@ -1,7 +1,6 @@
 
 import React, { createContext, useState, useContext } from "react";
 import { Activity, ActivityAction, EntityType } from "@/types/activity";
-import { useUsers } from "./UserContext";
 
 interface ActivityContextType {
   activities: Activity[];
@@ -10,6 +9,8 @@ interface ActivityContextType {
     entityType: EntityType,
     entityId: string,
     entityName: string,
+    userId?: string,
+    userName?: string,
     details?: Record<string, any>
   ) => void;
   clearActivities: () => void;
@@ -19,17 +20,14 @@ const ActivityContext = createContext<ActivityContextType | undefined>(undefined
 
 export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [activities, setActivities] = useState<Activity[]>([]);
-  const { users } = useUsers();
   
-  // Assuming the first user is the current user for now
-  // In a real app, you'd use authentication to get the current user
-  const currentUser = users.length > 0 ? users[0] : { id: "system", name: "System" };
-
   const addActivity = (
     action: ActivityAction,
     entityType: EntityType,
     entityId: string,
     entityName: string,
+    userId: string = "system",
+    userName: string = "System",
     details?: Record<string, any>
   ) => {
     const newActivity: Activity = {
@@ -38,8 +36,8 @@ export const ActivityProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       entityType,
       entityId,
       entityName,
-      userId: currentUser.id,
-      userName: currentUser.name,
+      userId,
+      userName,
       timestamp: Date.now(),
       details
     };

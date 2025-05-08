@@ -7,13 +7,13 @@ import TagDashboard from "@/components/tag/TagDashboard";
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <UserProvider>
-        <ActivityProvider>
+      <ActivityProvider>
+        <UserProvider>
           <TagProvider>
             <TagDashboard />
           </TagProvider>
-        </ActivityProvider>
-      </UserProvider>
+        </UserProvider>
+      </ActivityProvider>
     </div>
   );
 };

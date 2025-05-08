@@ -3,6 +3,7 @@ import React, { createContext, useState, useContext } from "react";
 import { Tag, TagColor } from "@/types/tag";
 import { toast } from "sonner";
 import { useActivities } from "./ActivityContext";
+import { useUsers } from "./UserContext";
 
 interface TagContextType {
   tags: Tag[];
@@ -33,6 +34,11 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [loading, setLoading] = useState(false);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const { addActivity } = useActivities();
+  const { users } = useUsers();
+  
+  // Assuming the first user is the current user for now
+  // In a real app, you'd use authentication to get the current user
+  const currentUser = users.length > 0 ? users[0] : { id: "system", name: "System" };
 
   const addTag = (name: string, color: TagColor) => {
     if (name.trim() === "") {
@@ -56,7 +62,14 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setTags([...tags, newTag]);
     
     // Log activity
-    addActivity("create", "tag", newTag.id, newTag.name);
+    addActivity(
+      "create", 
+      "tag", 
+      newTag.id, 
+      newTag.name, 
+      currentUser.id, 
+      currentUser.name
+    );
     
     toast.success(`Tag "${name}" created successfully`);
   };
@@ -84,7 +97,14 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
     
     // Log activity
-    addActivity("update", "tag", id, name.trim());
+    addActivity(
+      "update", 
+      "tag", 
+      id, 
+      name.trim(), 
+      currentUser.id, 
+      currentUser.name
+    );
     
     toast.success(`Tag "${name}" updated successfully`);
   };
@@ -97,7 +117,14 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setSelectedTags(selectedTags.filter(tagId => tagId !== id));
     
     // Log activity
-    addActivity("delete", "tag", id, tagToDelete.name);
+    addActivity(
+      "delete", 
+      "tag", 
+      id, 
+      tagToDelete.name, 
+      currentUser.id, 
+      currentUser.name
+    );
     
     toast.success(`Tag "${tagToDelete.name}" deleted successfully`);
   };
@@ -130,7 +157,15 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     
     // Log assign activities for new assignments
     newlyAssignedUsers.forEach(userId => {
-      addActivity("assign", "tag", tagId, tag.name, { userId });
+      addActivity(
+        "assign", 
+        "tag", 
+        tagId, 
+        tag.name, 
+        currentUser.id, 
+        currentUser.name,
+        { userId }
+      );
     });
     
     toast.success("Users assigned to tag successfully");
@@ -149,7 +184,15 @@ export const TagProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     );
     
     // Log unassign activity
-    addActivity("unassign", "tag", tagId, tag.name, { userId });
+    addActivity(
+      "unassign", 
+      "tag", 
+      tagId, 
+      tag.name, 
+      currentUser.id, 
+      currentUser.name,
+      { userId }
+    );
     
     toast.success("User removed from tag successfully");
   };

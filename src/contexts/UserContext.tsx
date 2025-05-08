@@ -51,8 +51,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     setUsers([...users, newUser]);
     
-    // Log activity
-    addActivity("create", "user", newUser.id, newUser.name);
+    // Log activity with current user info
+    addActivity(
+      "create", 
+      "user", 
+      newUser.id, 
+      newUser.name,
+      users.length > 0 ? users[0].id : "system",
+      users.length > 0 ? users[0].name : "System"
+    );
     
     toast.success(`User "${name}" added successfully`);
   };
@@ -74,8 +81,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
       )
     );
     
-    // Log activity
-    addActivity("update", "user", id, name.trim());
+    // Log activity with current user info
+    addActivity(
+      "update", 
+      "user", 
+      id, 
+      name.trim(),
+      users.length > 0 ? users[0].id : "system",
+      users.length > 0 ? users[0].name : "System"
+    );
     
     toast.success(`User "${name}" updated successfully`);
   };
@@ -87,8 +101,15 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUsers(users.filter(user => user.id !== id));
     setSelectedUsers(selectedUsers.filter(userId => userId !== id));
     
-    // Log activity
-    addActivity("delete", "user", id, userToDelete.name);
+    // Log activity with current user info
+    addActivity(
+      "delete", 
+      "user", 
+      id, 
+      userToDelete.name,
+      users.length > 0 ? users[0].id : "system",
+      users.length > 0 ? users[0].name : "System"
+    );
     
     toast.success(`User "${userToDelete.name}" deleted successfully`);
   };
